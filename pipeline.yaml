@@ -8,7 +8,7 @@ resources:
 jobs:
   - name: scrape-reliance-data
     plan:
-      - get: vault-secrets
+      - get: git-pipeline
       - task: scrape-task
         config:
           platform: linux
