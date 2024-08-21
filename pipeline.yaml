@@ -1,12 +1,9 @@
 resources:
-  - name: vault-secrets
-    type: vault
+  - name: git-pipeline
+    type: git
     source:
-      url: http://127.0.0.1:8200
-      path_prefix: /secret/data/my-secrets
-      auth_backend: token
-      auth_params:
-        token: root-token
+      uri: "https://github.com/Gauravambartani1/concourse.git"
+      branch: main
 
 jobs:
   - name: scrape-reliance-data
