@@ -23,7 +23,6 @@ jobs:
           run:
             path: sh
             args:
- 
               - -c
               - |
                 export VAULT_ADDR='http://192.168.3.55:8200'
