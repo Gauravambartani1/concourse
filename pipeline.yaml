@@ -13,10 +13,7 @@ jobs:
         config:
           platform: linux
           image_resource:
-            type: docker-image
-            source:
-              repository: python:3.9
-      
+            type: docker-image      
           outputs:
             - name: output-data
           run:
