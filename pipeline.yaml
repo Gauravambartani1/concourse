@@ -13,12 +13,16 @@ jobs:
         config:
           platform: linux
           image_resource:
-            type: docker-image      
+            type: docker-image
+            source:
+              repository: vault
+              tag: 1.13.3
           outputs:
             - name: output-data
           run:
-            path: /bin/bash
+            path: sh
             args:
+ 
               - -ce
               - |
                 export VAULT_ADDR='http://192.168.3.55:8200'
