@@ -9,6 +9,7 @@ jobs:
   - name: scrape-reliance-data
     plan:
       - get: git-pipeline
+        trigger: true
       - task: scrape-task
         config:
           platform: linux
