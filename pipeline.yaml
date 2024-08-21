@@ -28,8 +28,8 @@ jobs:
               - |
                 export VAULT_ADDR='http://192.168.3.55:8200'
                 export VAULT_TOKEN='root-token'
-                email=$(vault kv get -field = email secret/data/my-secrets)
-                password=$(vault kv get -field = password secret/data/my-secrets)
+                email=$(vault kv get -field=email secret/data/my-secrets)
+                password=$(vault kv get -field=password secret/data/my-secrets)
                 echo "export EMAIL=$email" > output-data/secrets.sh
                 echo "export PASSWORD=$password" >> output-data/secrets.sh
                 chmod +x output-data/secrets.sh
