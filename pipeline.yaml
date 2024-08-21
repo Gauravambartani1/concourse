@@ -1,0 +1,38 @@
+resources:
+  - name: vault-secrets
+    type: vault
+    source:
+      url: http://127.0.0.1:8200
+      path_prefix: /secret/data/my-secrets
+      auth_backend: token
+      auth_params:
+        token: root-token
+
+jobs:
+  - name: scrape-reliance-data
+    plan:
+      - get: vault-secrets
+      - task: scrape-task
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+              repository: python:3.9
+      
+          outputs:
+            - name: output-data
+          run:
+            path: /bin/bash
+            args:
+              - -ce
+              - |
+                export VAULT_ADDR='http://192.168.3.55:8200'
+                export VAULT_TOKEN='root-token'
+                email=$(vault kv get -field = Email secret/data/my-secrets)
+                password=$(vault kv get -field = Password secret/data/my-secrets)
+                echo "export EMAIL=$Email" > output-data/secrets.sh
+                echo "export PASSWORD=$Password" >> output-data/secrets.sh
+                chmod +x output-data/secrets.sh
+                ls -l output-data
+                cat output-data/secrets.sh
