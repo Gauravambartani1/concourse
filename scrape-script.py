@@ -3,11 +3,23 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 import psycopg2
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, Integer, Float, String
+from sqlalchemy.engine import URL
+
+# Setup the connection to PostgreSQL
+connection_url = URL.create(
+    "postgresql",
+    username="postgres",
+    password="Abcd@1234",
+    host="localhost",
+    port=5432,
+    database="Test_DB",
+)
+engine = create_engine(connection_url)
 
 # Get the secrets from the environment
-EMAIL = 'ambartanigaurav7@gmail.com'
-PASSWORD = 'Abcd@1234'
+EMAIL = os.getenv('EMAIL')
+PASSWORD = os.getenv('PASSWORD')
 
 # Login to screener.in
 login_url = "https://www.screener.in/login/"
@@ -35,9 +47,8 @@ login_payload = {
 login_response = session.post(login_url, data=login_payload, headers=headers)
 if login_response.status_code != 200:
     print("Login failed!")
-    print(login_response.content)  # Print the response content
+    print(login_response.content)  # Print the response content for debugging
     exit()
-
 
 # URL for Reliance Industries' Profit & Loss data
 reliance_url = "https://www.screener.in/company/RELIANCE/consolidated/"
@@ -57,7 +68,39 @@ df.columns = df.iloc[0].str.strip().str.replace('+', '').str.replace('%', '')
 df = df.iloc[1:]
 df.index.name = 'Financial Metric'
 
+# Cleaning the data
+
+# Remove '%' sign and convert numeric columns to appropriate types
+for column in df.columns:
+    if df[column].dtype == 'object':
+        df[column] = df[column].str.replace('%', '')  # Remove percentage signs
+        df[column] = pd.to_numeric(df[column], errors='coerce')  # Convert to numeric (float or int)
+
+# Ensure the appropriate data types for each column
+# Convert float columns to integers where applicable (e.g., no decimals in the data)
+for col in df.columns:
+    if df[col].notna().all() and (df[col] % 1 == 0).all():
+        df[col] = df[col].astype('int')
+
 # Save the DataFrame to a CSV file
 csv_file = 'reliance_profit_loss.csv'
 df.to_csv(csv_file)
 print(f"Data saved to {csv_file}")
+
+# Save the DataFrame to a Postgres table
+df.to_sql('reliance_profit_loss', engine, if_exists='replace', index=True, dtype={
+    "Sales": Integer(),
+    "Expenses": Integer(),
+    "Operating Profit": Integer(),
+    "OPM ": Float(),
+    "Other Income": Integer(),
+    "Interest": Integer(),
+    "Depreciation": Integer(),
+    "Profit before tax": Integer(),
+    "Tax ": Float(),
+    "Net Profit": Integer(),
+    "EPS in Rs": Float(),
+    "Dividend Payout ": Float()
+})
+
+print("Data saved to Postgres table")
