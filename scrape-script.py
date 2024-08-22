@@ -11,7 +11,7 @@ connection_url = URL.create(
     "postgresql",
     username="postgres",
     password="Abcd@1234",
-    host="localhost",
+    host="192.168.3.55",
     port=5432,
     database="Test_DB",
 )
